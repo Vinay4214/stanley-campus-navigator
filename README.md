@@ -71,7 +71,7 @@ Create `inputs/streetview-links.txt`, with one line per **owner-provided** offic
 Library E-205 | https://maps.app.goo.gl/your-official-share-link
 ```
 
-Run `npm run streetview:build`. The script matches place text or room codes against the campus room catalog, writes matched Google Maps URLs to `src/data/streetview.json`, and reports unmatched/invalid lines. Never paste scraped imagery or synthesized links into this file. Google Maps/Street View imagery is never scraped, captured, downloaded, cached, or re-hosted by this project. External links open in a new tab with `rel="noopener noreferrer"`.
+Run `npm run streetview:build`. The script matches place text or room codes against the campus room catalog, writes matched HTTPS Google Maps URLs (`google.com` or `maps.app.goo.gl`) to `src/data/streetview.json`, and reports unmatched/invalid lines. Never paste scraped imagery or synthesized links into this file. Google Maps/Street View imagery is never scraped, captured, downloaded, cached, or re-hosted by this project. External links open in a new tab with `rel="noopener noreferrer"`.
 
 ## Assumptions and limitations
 

@@ -40,7 +40,10 @@ try {
       unmatched.push(line)
       continue
     }
-    if (!['google.com', 'www.google.com', 'maps.app.goo.gl'].includes(url.hostname)) {
+    const isGoogleMapsHost = url.hostname === 'google.com'
+      || url.hostname.endsWith('.google.com')
+      || url.hostname === 'maps.app.goo.gl'
+    if (url.protocol !== 'https:' || !isGoogleMapsHost) {
       unmatched.push(line)
       continue
     }
