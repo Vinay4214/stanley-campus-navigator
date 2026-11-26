@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700">
+  <rect width="1000" height="700" rx="32" fill="#f3efe7"/>
+  <path d="M56 96H944V622H56z" fill="#e7eddf" stroke="#d3ddce" stroke-width="2"/>
+  <path d="M500 580V355M500 355L190 220M500 355L500 194M500 355L810 220M500 355L300 465M500 355L700 465" fill="none" stroke="#d8c8a9" stroke-width="30" stroke-linecap="round"/>
+  <ellipse cx="500" cy="355" rx="122" ry="80" fill="#e2ece1" stroke="#b8c9b8" stroke-width="2"/>
+  <text x="500" y="350" text-anchor="middle" fill="#58705a" font-family="sans-serif" font-size="20" font-weight="700">OPEN AREA</text>
+  <text x="500" y="376" text-anchor="middle" fill="#758472" font-family="sans-serif" font-size="12">Campus courtyard</text>
+  <g font-family="sans-serif" text-anchor="middle">
+    <g><rect x="110" y="135" width="160" height="152" rx="18" fill="#fffdf8" stroke="#d6c6a2" stroke-width="3"/><text x="190" y="203" fill="#7a1f2b" font-size="26" font-weight="700">A</text><text x="190" y="230" fill="#51443c" font-size="14">BLOCK A</text></g>
+    <g><rect x="418" y="120" width="164" height="148" rx="18" fill="#fffdf8" stroke="#cdaeb0" stroke-width="3"/><text x="500" y="184" fill="#7a1f2b" font-size="26" font-weight="700">B</text><text x="500" y="211" fill="#51443c" font-size="14">BLOCK B</text></g>
+    <g><rect x="730" y="135" width="160" height="152" rx="18" fill="#fffdf8" stroke="#b9c9b8" stroke-width="3"/><text x="810" y="203" fill="#7a1f2b" font-size="26" font-weight="700">C</text><text x="810" y="230" fill="#51443c" font-size="14">BLOCK C</text></g>
+    <g><rect x="214" y="402" width="172" height="132" rx="18" fill="#fffdf8" stroke="#b8c5d0" stroke-width="3"/><text x="300" y="461" fill="#7a1f2b" font-size="26" font-weight="700">D</text><text x="300" y="488" fill="#51443c" font-size="14">BLOCK D</text></g>
+    <g><rect x="614" y="402" width="172" height="132" rx="18" fill="#fffdf8" stroke="#d8c1a8" stroke-width="3"/><text x="700" y="461" fill="#7a1f2b" font-size="26" font-weight="700">E</text><text x="700" y="488" fill="#51443c" font-size="14">BLOCK E</text></g>
+  </g>
+  <g font-family="sans-serif" font-size="12" fill="#6c6259" text-anchor="middle">
+    <rect x="80" y="562" width="170" height="40" rx="12" fill="#e9ddc9"/><text x="165" y="586">PARKING AREA</text>
+    <rect x="780" y="565" width="150" height="42" rx="12" fill="#e3d6c0"/><text x="855" y="590">PLAY AREA</text>
+    <rect x="818" y="340" width="112" height="44" rx="12" fill="#fff2d6"/><text x="874" y="367">CANTEEN</text>
+    <circle cx="500" cy="620" r="13" fill="#7a1f2b"/><text x="500" y="654" fill="#7a1f2b" font-weight="700">MAIN GATE</text>
+  </g>
+</svg>
