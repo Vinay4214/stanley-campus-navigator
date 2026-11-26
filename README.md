@@ -57,11 +57,16 @@ Place your own equirectangular panorama in `public/360/`, then add a record to `
 
 ```json
 [
-  { "file": "library-E205-floor2.jpg", "room": "E-205", "name": "Library · second floor" }
+  {
+    "file": "library-E205-floor2.jpg",
+    "room": "E-205",
+    "name": "Library · second floor",
+    "hotspots": ["E-204"]
+  }
 ]
 ```
 
-Use descriptive filenames such as `library-E205-floor2.jpg`; `file` is the filename within `public/360/`, `room` is the related room code, and `name` is its visible label. Open the **360° views** page to view the panorama. Keep source images optimized and obtain appropriate permission before publishing photos. Panorama hotspot arrows are not configured in this first demo.
+Use descriptive filenames such as `library-E205-floor2.jpg`; `file` is the filename within `public/360/`, `room` is the related room code, and `name` is its visible label. `hotspots` lists the room IDs of connected panoramas; the **360° views** page shows clickable arrow chips for available linked panoramas, and matching route steps offer a **Preview this turn** link. Keep source images optimized and obtain appropriate permission before publishing photos.
 
 ### Add an official Google Maps share link
 

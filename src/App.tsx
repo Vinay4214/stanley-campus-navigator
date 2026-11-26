@@ -20,6 +20,14 @@ import Panorama from './components/Panorama'
 
 const Twin = lazy(() => import('./components/Twin'))
 const floorNames = ['Ground', '1st', '2nd', '3rd', '4th']
+interface PanoramaAsset {
+  file: string
+  room: string
+  name: string
+  hotspots?: string[]
+}
+const panoramaAssets = panoramaData as PanoramaAsset[]
+const streetviewLinks = streetviewData as { place: string; url: string; room: string }[]
 const categories = [
   { label: 'Library', query: 'library', icon: BookOpen },
   { label: 'Washroom', query: 'nearest washroom', icon: LocateFixed },
@@ -380,7 +388,12 @@ function HomePage({ state, updateState, accessible, speak }: HomeProps) {
                 <div className="route-controls"><button className="start-button" onClick={() => { setSimulating(value => !value); setProgress(0) }}><Navigation size={16}/>{simulating ? 'Pause demo walk' : 'Start navigation'}</button><button className="icon-button" onClick={speakDirections} title="Read directions aloud"><Volume2 size={17}/></button></div>
                 <div className="simulation-note"><span className="blue-pulse"/> Simulated positioning (demo) <button onClick={() => setShowHere(true)}>Set location</button></div>
                 <button className="steps-toggle" onClick={() => setShowSteps(value => !value)}>{showSteps ? 'Hide' : 'Show'} turn-by-turn <ChevronDown size={16}/></button>
-                {showSteps && <ol className="directions-list">{route.steps.map((step, index) => <li key={`${step}-${index}`} className={index < progress ? 'passed' : ''}><span className="step-marker">{index < progress ? <Check size={12}/> : index + 1}</span><span>{step}{index === 0 && <small className="preview-chip">360° preview coming soon</small>}</span></li>)}</ol>}
+                {showSteps && <ol className="directions-list">{route.steps.map((step, index) => {
+                  const nextId = route.nodeIds[index + 1]
+                  const panorama = panoramaAssets.find(item => item.room === nextId)
+                  const shareLink = streetviewLinks.find(item => item.room === nextId)
+                  return <li key={`${step}-${index}`} className={index < progress ? 'passed' : ''}><span className="step-marker">{index < progress ? <Check size={12}/> : index + 1}</span><span>{step}{index < route.edges.length && (panorama ? <Link className="preview-chip" to={`/360?room=${encodeURIComponent(panorama.room)}`}>Preview this turn <ArrowUpRight size={11}/></Link> : shareLink ? <a className="preview-chip" href={shareLink.url} target="_blank" rel="noopener noreferrer">Preview this turn <ExternalLink size={11}/></a> : <small className="preview-chip">360° preview coming soon</small>)}</span></li>
+                })}</ol>}
                 {progress >= route.nodeIds.length - 1 && <div className="arrived-card"><Sparkles size={17}/><div><b>You have arrived</b><small>{target.id} · Block {target.block}</small></div></div>}
                 <a className="street-view-link" href={`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${import.meta.env.VITE_CAMPUS_LAT ?? '17.3913'},${import.meta.env.VITE_CAMPUS_LNG ?? '78.4750'}`} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> Outdoor Street View</a>
               </div>
@@ -498,15 +511,18 @@ function TwinPage() {
 }
 
 function PanoramaPage() {
-  const panoramaImages = useMemo(() => {
-    try { return panoramaData as { file: string; room: string; name: string }[] }
-    catch (error) { console.error('Unable to load panorama list.', error); return [] }
-  }, [])
-  const [current, setCurrent] = useState<{ file: string; room: string; name: string } | null>(null)
-  const shareLinks = useMemo(() => streetviewData as { place: string; url: string; room: string }[], [])
+  const panoramaImages = panoramaAssets
+  const [current, setCurrent] = useState<PanoramaAsset | null>(() => {
+    const room = new URLSearchParams(window.location.search).get('room')
+    return panoramaImages.find(item => item.room === room) ?? null
+  })
+  const shareLinks = useMemo(() => streetviewLinks, [])
+  const hotspots = current?.hotspots
+    ?.map(room => panoramaImages.find(image => image.room === room))
+    .filter((image): image is PanoramaAsset => image !== undefined) ?? []
   return <section className="page subpage">
     <PageIntro eyebrow="LOOK AROUND" title="360° campus views" text="Preview your surroundings before you set off. Personal panoramas stay on this site; official share links open separately."/>
-    {current && <div className="panorama-modal"><div className="panorama-modal-head"><div><b>{current.name}</b><small>{current.room}</small></div><button className="icon-button" onClick={() => setCurrent(null)} aria-label="Close panorama"><X size={18}/></button></div><Panorama image={`/360/${encodeURIComponent(current.file)}`}/></div>}
+    {current && <div className="panorama-modal"><div className="panorama-modal-head"><div><b>{current.name}</b><small>{current.room}</small></div><button className="icon-button" onClick={() => setCurrent(null)} aria-label="Close panorama"><X size={18}/></button></div><div className="panorama-stage"><Panorama image={`/360/${encodeURIComponent(current.file)}`}/>{hotspots.length > 0 && <div className="panorama-hotspots" aria-label="Connected panorama hotspots">{hotspots.map((spot, index) => <button key={spot.room} style={{ '--hotspot-index': index } as React.CSSProperties} onClick={() => setCurrent(spot)}><ArrowRight size={14}/>{spot.name}</button>)}</div>}</div></div>}
     <div className="panorama-grid">
       {panoramaImages.map(image => <button className="panorama-tile has-panorama" key={image.file} onClick={() => setCurrent(image)}><span className="panorama-cover"><span>360°</span></span><b>{image.name}</b><small>{image.room}</small><span className="panorama-chip">Open panorama <ArrowUpRight size={14}/></span></button>)}
       {campus.rooms.slice(0, 8).map(room => <article className="panorama-tile" key={room.id}><div className="panorama-empty"><span className="panorama-symbol">360°</span><span className="view-coming">Coming soon</span></div><b>{room.name}</b><small>{room.id} · Block {room.block}</small><span className="panorama-chip muted-chip">360° view coming soon</span></article>)}
