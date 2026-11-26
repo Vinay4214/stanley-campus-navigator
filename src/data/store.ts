@@ -5,12 +5,13 @@ export interface DemoState {
   blocked: string[]
   announcement: string
   searches: Record<string, number>
+  recentSearches: string[]
   routes: Record<string, number>
 }
 
 const STATE_KEY = 'stanley-navigator-state'
 const CHANNEL_NAME = 'stanley-navigator-live'
-const emptyState: DemoState = { blocked: [], announcement: '', searches: {}, routes: {} }
+const emptyState: DemoState = { blocked: [], announcement: '', searches: {}, recentSearches: [], routes: {} }
 let channel: BroadcastChannel | null = null
 
 function browser() {
@@ -47,7 +48,11 @@ export function toggleBlocked(state: DemoState, edge: CampusEdge): DemoState {
 
 export function trackSearch(state: DemoState, query: string): DemoState {
   const key = query.trim()
-  return key ? { ...state, searches: { ...state.searches, [key]: (state.searches[key] ?? 0) + 1 } } : state
+  return key ? {
+    ...state,
+    searches: { ...state.searches, [key]: (state.searches[key] ?? 0) + 1 },
+    recentSearches: [key, ...state.recentSearches.filter(item => item.toLowerCase() !== key.toLowerCase())].slice(0, 5)
+  } : state
 }
 
 export function trackRoute(state: DemoState, route: string): DemoState {
@@ -61,10 +66,10 @@ export function subscribeState(listener: (state: DemoState) => void) {
     if (event.key === STATE_KEY) listener(readState())
   }
   const onMessage = (event: MessageEvent<DemoState>) => listener(event.data)
-  window.addEventListener('storage', onStorage)
-  channel?.addEventListener('message', onMessage)
+  if (channel) channel.addEventListener('message', onMessage)
+  else window.addEventListener('storage', onStorage)
   return () => {
-    window.removeEventListener('storage', onStorage)
-    channel?.removeEventListener('message', onMessage)
+    if (channel) channel.removeEventListener('message', onMessage)
+    else window.removeEventListener('storage', onStorage)
   }
 }

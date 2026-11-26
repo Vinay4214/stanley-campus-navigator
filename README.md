@@ -24,13 +24,14 @@ The static production bundle is written to `dist/`. Vercel is configured for SPA
 
 ## Features
 
-- Search by room code, room name, department, HoD, lab, library, exam office, canteen, or washroom. Searches use Fuse.js and support simple natural-language prefixes such as “where is” and “take me to.”
+- Search by room code, room name, department, HoD, lab, library, exam office, canteen, or washroom. Searches use Fuse.js and support simple natural-language prefixes such as “where is” and “take me to.” Recent searches are shown as quick chips.
 - Select a block and switch between ground and 1st–4th floors. Upper floors display an explicit approximate-layout notice.
 - Routes use Dijkstra's algorithm. Accessibility mode excludes stairs and uses edges marked accessible; the high-contrast palette and large-text control are available in the header.
 - Simulated route progress, landmark starting points, QR print sheets, speech synthesis, optional browser speech recognition, emergency exit routing, and sample event links.
 - The admin page uses demo PIN **1234**. Corridor-condition switches, announcements, and search/route counters are saved locally and broadcast to other tabs on the same origin. This is a demo convenience, not production authentication or a cross-device service.
 - The digital twin is a lazy-loaded interactive Three.js view. Its geometry is illustrative demo data, not a surveyed building model.
 - The progressive web app caches the application shell for offline reopening. Search/routing data ships in the static build.
+- Lenis provides smooth scrolling and defers to the operating system's reduced-motion preference.
 - AR is intentionally presented only as a roadmap item. The app does not claim to implement WebXR.
 
 ## Editing campus data

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import Lenis from 'lenis'
 import Fuse from 'fuse.js'
 import QRCode from 'qrcode'
 import {
@@ -52,15 +53,26 @@ export default function App() {
   const [accessible, setAccessible] = useState(false)
   const [largeText, setLargeText] = useState(false)
   const [state, setState] = useState<DemoState>(() => readState())
+  const stateRef = useRef(state)
   const [toast, setToast] = useState('')
   const [muted, setMuted] = useState(false)
   const [voiceLang, setVoiceLang] = useState('en-IN')
 
   useEffect(() => subscribeState(next => {
+    const routeChanged = next.blocked.join('|') !== stateRef.current.blocked.join('|')
+    stateRef.current = next
     setState(next)
-    setToast('Route updated · campus conditions changed')
-    window.setTimeout(() => setToast(''), 3500)
+    if (routeChanged) {
+      setToast('Route updated · campus conditions changed')
+      window.setTimeout(() => setToast(''), 3500)
+    }
   }), [])
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const lenis = new Lenis({ autoRaf: !reducedMotion, duration: reducedMotion ? 0.1 : 0.8 })
+    return () => lenis.destroy()
+  }, [])
 
   useEffect(() => {
     document.documentElement.dataset.theme = accessible ? 'contrast' : theme
@@ -73,6 +85,7 @@ export default function App() {
   }, [location.pathname])
 
   const updateState = (next: DemoState) => {
+    stateRef.current = next
     setState(next)
     writeState(next)
   }
@@ -214,7 +227,7 @@ function HomePage({ state, updateState, accessible, speak }: HomeProps) {
     setProgress(0)
   }, [state.blocked, accessible])
 
-  function chooseRoom(room: CampusRoom | null) {
+  function chooseRoom(room: CampusRoom | null, searchTerm = query) {
     if (!room) return
     const nextRoute = findRoute(from, room.id, { accessible, blocked: state.blocked })
     setTarget(room)
@@ -226,7 +239,7 @@ function HomePage({ state, updateState, accessible, speak }: HomeProps) {
     setProgress(0)
     setSimulating(false)
     if (nextRoute) {
-      updateState(trackRoute(trackSearch(state, query || room.id), `${from} → ${room.id}`))
+      updateState(trackRoute(trackSearch(state, searchTerm || room.id), `${from} → ${room.id}`))
       searchRef.current?.blur()
     }
   }
@@ -238,12 +251,13 @@ function HomePage({ state, updateState, accessible, speak }: HomeProps) {
       ? nearestRoom(from, 'washroom', { accessible, blocked: state.blocked })
       : null
     if (nearest) {
-      chooseRoom(nearest.room)
+      chooseRoom(nearest.room, clean)
       return
     }
     const exact = campus.rooms.find(room => room.id.toLowerCase() === clean.toLowerCase())
     const match = exact ?? fuse.search(clean.replace(/^(where is|find|take me to|navigate to)\s+/i, '').trim())[0]?.item
-    if (match) chooseRoom(match)
+    if (match) chooseRoom(match, clean)
+    else updateState(trackSearch(state, clean))
   }
 
   function speakDirections() {
@@ -309,6 +323,7 @@ function HomePage({ state, updateState, accessible, speak }: HomeProps) {
             <div className="search-hint"><span>Try</span> <button onClick={() => { setQuery('where is CSE department'); submitSearch('where is CSE department') }}>“where is CSE department”</button><span>or</span><button onClick={() => { setQuery('nearest washroom'); submitSearch('nearest washroom') }}>“nearest washroom”</button></div>
           </div>
           <div className="category-row">{categories.map(({ label, query: itemQuery, icon: Icon }) => <button key={label} className="category-chip" onClick={() => { setQuery(itemQuery); submitSearch(itemQuery) }}><Icon size={15}/>{label}</button>)}</div>
+          {!query && state.recentSearches.length > 0 && <div className="recent-searches"><span>RECENT</span>{state.recentSearches.slice(0, 3).map(item => <button key={item} onClick={() => { setQuery(item); submitSearch(item) }}>{item}</button>)}</div>}
           <div className="hero-stats"><div><b>5</b><span>blocks</span></div><i/><div><b>5</b><span>floors</span></div><i/><div><b>{campus.rooms.length}+</b><span>destinations</span></div></div>
         </div>
         <div className="hero-art" aria-hidden="true">
@@ -447,7 +462,7 @@ function AdminPage({ state, updateState }: { state: DemoState; updateState: (sta
     <PageIntro eyebrow="CAMPUS OPERATIONS" title="Admin dashboard" text="Manage route conditions, share updates and review local demo analytics."/>
     <div className="admin-grid">
       <div className="admin-card admin-announcement"><div className="admin-card-heading"><span className="admin-icon gold-bg"><Bell size={18}/></span><div><h3>Campus announcement</h3><p>Shown across all open navigator tabs on this device.</p></div></div><textarea value={announcement} onChange={event => { setAnnouncement(event.target.value); setAnnouncementSaved(false) }} placeholder="e.g. Library entrance temporarily closed…"/><div className="admin-form-bottom"><small>{announcement.length}/160 characters</small><button className="button-primary small" disabled={announcement.length > 160} onClick={() => { updateState({ ...state, announcement }); setAnnouncementSaved(true) }}>{announcementSaved ? <><Check size={15}/> Published</> : 'Publish announcement'}</button></div></div>
-      <div className="admin-card"><div className="admin-card-heading"><span className="admin-icon rose-bg"><Navigation size={18}/></span><div><h3>Route conditions</h3><p>Block a corridor, stairs or lift to recalculate routes.</p></div></div><div className="edge-list">{uniqueEdges.filter(edge => ['corridor', 'stairs', 'lift', 'ramp'].includes(edge.type)).slice(0, 22).map(edge => { const key = edgeKey(edge); const blocked = state.blocked.includes(key); const label = `${campus.nodes.find(node => node.id === edge.from)?.name ?? edge.from} → ${campus.nodes.find(node => node.id === edge.to)?.name ?? edge.to}`; return <div key={key} className="edge-row"><span><b>{edge.type}</b><small>{label}</small></span><button className={`switch ${blocked ? 'switch-on' : ''}`} role="switch" aria-checked={blocked} aria-label={`${blocked ? 'Unblock' : 'Block'} ${edge.type}`} onClick={() => updateState(toggleBlocked(state, edge))}><i/></button></div> })}</div></div>
+      <div className="admin-card"><div className="admin-card-heading"><span className="admin-icon rose-bg"><Navigation size={18}/></span><div><h3>Route conditions</h3><p>Block a corridor, stairs or lift to recalculate routes.</p></div></div><div className="edge-list">{uniqueEdges.filter(edge => ['corridor', 'stairs', 'lift', 'ramp'].includes(edge.type)).map(edge => { const key = edgeKey(edge); const blocked = state.blocked.includes(key); const label = `${campus.nodes.find(node => node.id === edge.from)?.name ?? edge.from} → ${campus.nodes.find(node => node.id === edge.to)?.name ?? edge.to}`; return <div key={key} className="edge-row"><span><b>{edge.type}</b><small>{label}</small></span><button className={`switch ${blocked ? 'switch-on' : ''}`} role="switch" aria-checked={blocked} aria-label={`${blocked ? 'Unblock' : 'Block'} ${edge.type}`} onClick={() => updateState(toggleBlocked(state, edge))}><i/></button></div> })}</div></div>
       <div className="admin-card analytics-card"><div className="admin-card-heading"><span className="admin-icon green-bg"><Sparkles size={18}/></span><div><h3>Demo analytics</h3><p>Search and route counts saved locally in this browser.</p></div></div><div className="analytics-columns"><div><h4>Most searched</h4>{searchData.length ? searchData.map(([name, count]) => <div className="analytics-row" key={name}><span>{name}</span><b>{count}</b></div>) : <p className="empty-analytics">Searches will appear here as you explore.</p>}</div><div><h4>Busiest routes</h4>{routeData.length ? routeData.map(([name, count]) => <div className="analytics-row" key={name}><span>{name}</span><b>{count}</b></div>) : <p className="empty-analytics">Route activity will appear here.</p>}</div></div></div>
     </div><div className="admin-footer-note"><Info size={15}/>Demo PIN protects the interface only. This dashboard is not an authenticated production admin system.</div>
   </section>

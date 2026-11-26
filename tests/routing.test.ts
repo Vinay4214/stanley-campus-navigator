@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { campus, edgeKey, findRoute, nearestRoom } from '../src/data/routing'
+import { trackSearch } from '../src/data/store'
 
 describe('campus routing', () => {
   it('finds a cross-floor route from the gate to the fourth-floor CSE department', () => {
@@ -35,5 +36,13 @@ describe('campus routing', () => {
     const nearest = nearestRoom('quad', 'washroom')
     expect(nearest?.room.id).toBe('C-010')
     expect(nearest?.route.distance).toBeGreaterThan(0)
+  })
+
+  it('keeps recent searches in most-recent-first order without duplicates', () => {
+    const first = trackSearch({ blocked: [], announcement: '', searches: {}, recentSearches: [], routes: {} }, 'Library')
+    const second = trackSearch(first, 'CSE')
+    const third = trackSearch(second, 'library')
+    expect(third.recentSearches).toEqual(['library', 'CSE'])
+    expect(third.searches.Library).toBe(1)
   })
 })
