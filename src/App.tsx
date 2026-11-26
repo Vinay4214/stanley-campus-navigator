@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Lenis from 'lenis'
 import Fuse from 'fuse.js'
-import QRCode from 'qrcode'
 import {
   Accessibility, ArrowLeft, ArrowRight, ArrowUpRight, AudioLines, Bell,
   BookOpen, Building2, Check, ChevronDown, ChevronRight, Clock3, Compass, ExternalLink,
@@ -10,15 +9,18 @@ import {
   Mic, Moon, Navigation, Plus, Search, ShieldAlert, Sparkles, Sun, Utensils, Volume2, VolumeX, X
 } from 'lucide-react'
 import { Link, Route, Routes, useLocation } from 'react-router-dom'
-import { campus, edgeKey, findRoute, nearestRoom } from './data/routing'
+import { campus, findRoute, nearestRoom } from './data/routing'
 import type { CampusRoom, RouteResult } from './data/types'
-import { readState, subscribeState, toggleBlocked, trackRoute, trackSearch, writeState } from './data/store'
+import { readState, subscribeState, trackRoute, trackSearch, writeState } from './data/store'
 import type { DemoState } from './data/store'
 import panoramaData from './data/panoramas.json'
 import streetviewData from './data/streetview.json'
-import Panorama from './components/Panorama'
 
 const Twin = lazy(() => import('./components/Twin'))
+const EventsPage = lazy(() => import('./pages/EventsPage'))
+const AdminPage = lazy(() => import('./pages/AdminPage'))
+const QrPage = lazy(() => import('./pages/QrPage'))
+const PanoramaPage = lazy(() => import('./pages/PanoramaPage'))
 const floorNames = ['Ground', '1st', '2nd', '3rd', '4th']
 interface PanoramaAsset {
   file: string
@@ -34,12 +36,6 @@ const categories = [
   { label: 'Canteen', query: 'canteen', icon: Utensils },
   { label: 'Departments', query: 'CSE department', icon: GraduationCap },
   { label: 'Exam cell', query: 'exam cell', icon: Bell }
-]
-const demoEvents = [
-  { title: 'Campus research symposium', kind: 'Seminar', time: 'Today · 11:00 AM', place: 'Main Auditorium', room: 'A-001', color: 'gold' },
-  { title: 'End-semester examinations', kind: 'Exams', time: 'Tomorrow · 9:30 AM', place: 'Examination Cell', room: 'E-012', color: 'rose' },
-  { title: 'Stanley cultural fest', kind: 'Fest', time: 'Fri, 2:00 PM', place: 'Open Area', room: 'quad', color: 'green' },
-  { title: 'Career & placements briefing', kind: 'Placements', time: 'Mon · 10:00 AM', place: 'Student Services', room: 'D-110', color: 'blue' }
 ]
 const voices = [
   { label: 'English', lang: 'en-IN' },
@@ -136,15 +132,17 @@ export default function App() {
 
       <AnimatePresence mode="wait">
         <motion.main key={location.pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -7 }} transition={{ duration: 0.24 }}>
-          <Routes>
-            <Route path="/" element={<HomePage state={state} updateState={updateState} accessible={accessible} speak={speak} />} />
-            <Route path="/events" element={<EventsPage onNavigate={room => window.location.assign(`/?to=${encodeURIComponent(room)}`)} />} />
-            <Route path="/admin" element={<AdminPage state={state} updateState={updateState}/>} />
-            <Route path="/qr" element={<QrPage />} />
-            <Route path="/360" element={<PanoramaPage />} />
-            <Route path="/twin" element={<TwinPage />} />
-            <Route path="*" element={<HomePage state={state} updateState={updateState} accessible={accessible} speak={speak} />} />
-          </Routes>
+          <Suspense fallback={<div className="page subpage" role="status">Loading campus view…</div>}>
+            <Routes>
+              <Route path="/" element={<HomePage state={state} updateState={updateState} accessible={accessible} speak={speak} />} />
+              <Route path="/events" element={<EventsPage onNavigate={room => window.location.assign(`/?to=${encodeURIComponent(room)}`)} />} />
+              <Route path="/admin" element={<AdminPage state={state} updateState={updateState}/>} />
+              <Route path="/qr" element={<QrPage />} />
+              <Route path="/360" element={<PanoramaPage />} />
+              <Route path="/twin" element={<TwinPage />} />
+              <Route path="*" element={<HomePage state={state} updateState={updateState} accessible={accessible} speak={speak} />} />
+            </Routes>
+          </Suspense>
         </motion.main>
       </AnimatePresence>
 
@@ -446,57 +444,6 @@ function HereModal({ onClose, onSelect }: { onClose: () => void; onSelect: (id: 
   )
 }
 
-function EventsPage({ onNavigate }: { onNavigate: (room: string) => void }) {
-  return <section className="page subpage">
-    <PageIntro eyebrow="CAMPUS LIFE" title="What's happening" text="Find your next seminar, exam, celebration or career moment."/>
-    <div className="events-grid">{demoEvents.map((event, index) => <motion.article key={event.title} className="event-card" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.08 }}><div className={`event-art ${event.color}`}><span>{event.kind}</span><div className="event-art-mark">{index === 0 ? <AudioLines/> : index === 1 ? <BookOpen/> : index === 2 ? <Sparkles/> : <GraduationCap/>}</div><b>STANLEY<br/><em>{event.kind.toUpperCase()}</em></b></div><div className="event-content"><small><Clock3 size={14}/>{event.time}</small><h3>{event.title}</h3><p><MapPin size={15}/>{event.place}</p><button className="button-primary" onClick={() => onNavigate(event.room)}>Navigate to event <ArrowRight size={16}/></button></div></motion.article>)}</div>
-    <div className="notice-card"><Info size={18}/><span>Event listings are sample demo data. Check official college notices for current schedules.</span></div>
-  </section>
-}
-
-function AdminPage({ state, updateState }: { state: DemoState; updateState: (state: DemoState) => void }) {
-  const [pin, setPin] = useState('')
-  const [authorized, setAuthorized] = useState(sessionStorage.getItem('stanley-admin') === 'yes')
-  const [announcement, setAnnouncement] = useState(state.announcement)
-  const [announcementSaved, setAnnouncementSaved] = useState(false)
-  const uniqueEdges = useMemo(() => {
-    const seen = new Set<string>()
-    return campus.edges.filter(edge => {
-      const key = edgeKey(edge)
-      if (seen.has(key)) return false
-      seen.add(key)
-      return true
-    })
-  }, [])
-  const searchData = Object.entries(state.searches).sort((a, b) => b[1] - a[1]).slice(0, 5)
-  const routeData = Object.entries(state.routes).sort((a, b) => b[1] - a[1]).slice(0, 5)
-  if (!authorized) return <section className="page subpage admin-login"><div className="admin-login-card"><span className="admin-lock"><ShieldAlert size={23}/></span><div className="eyebrow">CAMPUS OPERATIONS</div><h1>Admin sign in</h1><p>Demo access for managing routes and campus notices.</p><form onSubmit={event => { event.preventDefault(); if (pin === '1234') { setAuthorized(true); sessionStorage.setItem('stanley-admin', 'yes') } else setPin('') }}><label htmlFor="admin-pin">Demo PIN</label><input id="admin-pin" type="password" inputMode="numeric" maxLength={4} value={pin} onChange={event => setPin(event.target.value)} placeholder="Enter 4-digit PIN"/><button className="button-primary">Continue <ArrowRight size={16}/></button></form><small>Use demo PIN <b>1234</b></small></div></section>
-  return <section className="page subpage admin-page">
-    <PageIntro eyebrow="CAMPUS OPERATIONS" title="Admin dashboard" text="Manage route conditions, share updates and review local demo analytics."/>
-    <div className="admin-grid">
-      <div className="admin-card admin-announcement"><div className="admin-card-heading"><span className="admin-icon gold-bg"><Bell size={18}/></span><div><h3>Campus announcement</h3><p>Shown across all open navigator tabs on this device.</p></div></div><textarea value={announcement} onChange={event => { setAnnouncement(event.target.value); setAnnouncementSaved(false) }} placeholder="e.g. Library entrance temporarily closed…"/><div className="admin-form-bottom"><small>{announcement.length}/160 characters</small><button className="button-primary small" disabled={announcement.length > 160} onClick={() => { updateState({ ...state, announcement }); setAnnouncementSaved(true) }}>{announcementSaved ? <><Check size={15}/> Published</> : 'Publish announcement'}</button></div></div>
-      <div className="admin-card"><div className="admin-card-heading"><span className="admin-icon rose-bg"><Navigation size={18}/></span><div><h3>Route conditions</h3><p>Block a corridor, stairs or lift to recalculate routes.</p></div></div><div className="edge-list">{uniqueEdges.filter(edge => ['corridor', 'stairs', 'lift', 'ramp'].includes(edge.type)).map(edge => { const key = edgeKey(edge); const blocked = state.blocked.includes(key); const label = `${campus.nodes.find(node => node.id === edge.from)?.name ?? edge.from} → ${campus.nodes.find(node => node.id === edge.to)?.name ?? edge.to}`; return <div key={key} className="edge-row"><span><b>{edge.type}</b><small>{label}</small></span><button className={`switch ${blocked ? 'switch-on' : ''}`} role="switch" aria-checked={blocked} aria-label={`${blocked ? 'Unblock' : 'Block'} ${edge.type}`} onClick={() => updateState(toggleBlocked(state, edge))}><i/></button></div> })}</div></div>
-      <div className="admin-card analytics-card"><div className="admin-card-heading"><span className="admin-icon green-bg"><Sparkles size={18}/></span><div><h3>Demo analytics</h3><p>Search and route counts saved locally in this browser.</p></div></div><div className="analytics-columns"><div><h4>Most searched</h4>{searchData.length ? searchData.map(([name, count]) => <div className="analytics-row" key={name}><span>{name}</span><b>{count}</b></div>) : <p className="empty-analytics">Searches will appear here as you explore.</p>}</div><div><h4>Busiest routes</h4>{routeData.length ? routeData.map(([name, count]) => <div className="analytics-row" key={name}><span>{name}</span><b>{count}</b></div>) : <p className="empty-analytics">Route activity will appear here.</p>}</div></div></div>
-    </div><div className="admin-footer-note"><Info size={15}/>Demo PIN protects the interface only. This dashboard is not an authenticated production admin system.</div>
-  </section>
-}
-
-function QrPage() {
-  const landmarks = campus.nodes.filter(node => ['gate', 'quad', 'parking', 'play', 'canteen', 'A-0', 'B-0', 'C-0', 'D-0', 'E-0'].includes(node.id))
-  const [codes, setCodes] = useState<Record<string, string>>({})
-  useEffect(() => {
-    let active = true
-    void Promise.all(landmarks.map(async node => [node.id, await QRCode.toDataURL(`${window.location.origin}/?landmark=${encodeURIComponent(node.id)}`, { width: 180, margin: 1, color: { dark: '#39272a', light: '#ffffff' } })] as const))
-      .then(entries => { if (active) setCodes(Object.fromEntries(entries)) })
-    return () => { active = false }
-  }, [])
-  return <section className="page subpage">
-    <PageIntro eyebrow="FIND YOUR PLACE" title="Landmark QR codes" text="Print these demo markers for key campus spots. Scan one to set your simulated starting point."/>
-    <div className="qr-grid">{landmarks.map((node, index) => <article className="qr-card" key={node.id} style={{ animationDelay: `${index * 40}ms` }}>{codes[node.id] ? <img src={codes[node.id]} alt={`QR code for ${node.name}`}/> : <div className="qr-placeholder"/>}<div><span>STANLEY CAMPUS</span><h3>{node.name}</h3><small>{node.block ? `Block ${node.block} · ${floorNames[node.floor]} floor` : 'Outdoor landmark'}</small></div><button onClick={() => window.print()} aria-label={`Print QR code for ${node.name}`}>Print</button></article>)}</div>
-    <div className="notice-card"><LocateFixed size={17}/><span>QR codes contain a link to this demo. Selecting “I'm here / Scan QR” in the navigator lets you snap to a landmark without requiring a camera.</span></div>
-  </section>
-}
-
 function TwinPage() {
   const [floor, setFloor] = useState(0)
   const [night, setNight] = useState(false)
@@ -507,28 +454,6 @@ function TwinPage() {
     <div className="twin-toolbar"><label>Floor <input type="range" min="0" max="4" value={floor} onChange={event => setFloor(Number(event.target.value))}/><b>{floorNames[floor]}</b></label><div><button className="quiet-button" onClick={() => setNight(value => !value)}>{night ? <Sun size={16}/> : <Moon size={16}/>} {night ? 'Day view' : 'Night view'}</button><button className="quiet-button" onClick={() => window.location.assign(`/?block=${selected}`)}><ArrowUpRight size={15}/> Explore on map</button></div></div>
     <div className="twin-stage"><Suspense fallback={<div className="twin-loading"><span className="skeleton-shimmer"/>Preparing 3D campus…</div>}><Twin floor={floor} routeIds={[]} night={night} onSelect={setSelected}/></Suspense><div className="twin-selected"><span className="selected-block-dot" style={{ backgroundColor: campus.buildings.find(item => item.id === selected)?.color }}/><div><small>SELECTED BUILDING</small><b>Block {selected}</b></div><span>Floor {floor}</span></div></div>
     <div className="ar-roadmap"><div className="roadmap-icon"><Sparkles size={20}/></div><div><b>AR navigation: coming soon</b><p>Roadmap: add WebXR guidance after accurate indoor mapping and on-device positioning are available.</p></div></div>
-  </section>
-}
-
-function PanoramaPage() {
-  const panoramaImages = panoramaAssets
-  const [current, setCurrent] = useState<PanoramaAsset | null>(() => {
-    const room = new URLSearchParams(window.location.search).get('room')
-    return panoramaImages.find(item => item.room === room) ?? null
-  })
-  const shareLinks = useMemo(() => streetviewLinks, [])
-  const hotspots = current?.hotspots
-    ?.map(room => panoramaImages.find(image => image.room === room))
-    .filter((image): image is PanoramaAsset => image !== undefined) ?? []
-  return <section className="page subpage">
-    <PageIntro eyebrow="LOOK AROUND" title="360° campus views" text="Preview your surroundings before you set off. Personal panoramas stay on this site; official share links open separately."/>
-    {current && <div className="panorama-modal"><div className="panorama-modal-head"><div><b>{current.name}</b><small>{current.room}</small></div><button className="icon-button" onClick={() => setCurrent(null)} aria-label="Close panorama"><X size={18}/></button></div><div className="panorama-stage"><Panorama image={`/360/${encodeURIComponent(current.file)}`}/>{hotspots.length > 0 && <div className="panorama-hotspots" aria-label="Connected panorama hotspots">{hotspots.map((spot, index) => <button key={spot.room} style={{ '--hotspot-index': index } as React.CSSProperties} onClick={() => setCurrent(spot)}><ArrowRight size={14}/>{spot.name}</button>)}</div>}</div></div>}
-    <div className="panorama-grid">
-      {panoramaImages.map(image => <button className="panorama-tile has-panorama" key={image.file} onClick={() => setCurrent(image)}><span className="panorama-cover"><span>360°</span></span><b>{image.name}</b><small>{image.room}</small><span className="panorama-chip">Open panorama <ArrowUpRight size={14}/></span></button>)}
-      {campus.rooms.slice(0, 8).map(room => <article className="panorama-tile" key={room.id}><div className="panorama-empty"><span className="panorama-symbol">360°</span><span className="view-coming">Coming soon</span></div><b>{room.name}</b><small>{room.id} · Block {room.block}</small><span className="panorama-chip muted-chip">360° view coming soon</span></article>)}
-      {shareLinks.map(item => <article className="panorama-tile link-tile" key={item.url}><div className="panorama-empty"><span className="panorama-symbol"><ExternalLink size={22}/></span><span className="view-coming">Official link</span></div><b>{item.place}</b><small>Matched to {item.room}</small><a className="panorama-chip" href={item.url} target="_blank" rel="noopener noreferrer">Open 360° view <ArrowUpRight size={14}/></a></article>)}
-    </div>
-    <div className="notice-card"><Info size={16}/><span>Only owner-provided panoramas and Google Maps share URLs are supported. Street View imagery is never downloaded, cached or re-hosted here.</span></div>
   </section>
 }
 
