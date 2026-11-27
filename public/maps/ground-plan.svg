@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title description">
+  <title id="title">Simplified Stanley College campus ground plan</title>
+  <desc id="description">A schematic campus overview with five blocks around the open area, a gate, parking, canteen, and play area.</desc>
+  <rect width="1200" height="700" fill="#f3f0e8"/>
+  <rect x="75" y="90" width="1050" height="520" rx="34" fill="#e7eddf" stroke="#cdd8c5" stroke-width="3"/>
+  <path d="M600 130v410M165 350h870" stroke="#d8d2c8" stroke-width="38" stroke-linecap="round"/>
+  <path d="M600 130v410M165 350h870" stroke="#fffdf7" stroke-width="3" stroke-dasharray="12 14"/>
+  <rect x="470" y="280" width="260" height="145" rx="30" fill="#dfe9d5" stroke="#bdcbb2" stroke-width="3"/>
+  <text x="600" y="350" text-anchor="middle" fill="#60735a" font-family="sans-serif" font-size="24" font-weight="700">OPEN AREA</text>
+  <g font-family="sans-serif" text-anchor="middle">
+    <g><rect x="145" y="150" width="170" height="95" rx="22" fill="#e8dcc5" stroke="#c9b690" stroke-width="3"/><text x="230" y="190" fill="#7a1f2b" font-size="27" font-weight="700">A</text><text x="230" y="218" fill="#665b51" font-size="15">BLOCK A</text></g>
+    <g><rect x="515" y="130" width="170" height="95" rx="22" fill="#e8d5d6" stroke="#c99da0" stroke-width="3"/><text x="600" y="170" fill="#7a1f2b" font-size="27" font-weight="700">B</text><text x="600" y="198" fill="#665b51" font-size="15">BLOCK B</text></g>
+    <g><rect x="885" y="150" width="170" height="95" rx="22" fill="#dce6d8" stroke="#a9bda5" stroke-width="3"/><text x="970" y="190" fill="#7a1f2b" font-size="27" font-weight="700">C</text><text x="970" y="218" fill="#665b51" font-size="15">BLOCK C</text></g>
+    <g><rect x="145" y="455" width="170" height="95" rx="22" fill="#dce3e9" stroke="#a9b9c7" stroke-width="3"/><text x="230" y="495" fill="#7a1f2b" font-size="27" font-weight="700">D</text><text x="230" y="523" fill="#665b51" font-size="15">BLOCK D</text></g>
+    <g><rect x="885" y="455" width="170" height="95" rx="22" fill="#e8dccf" stroke="#ccb69c" stroke-width="3"/><text x="970" y="495" fill="#7a1f2b" font-size="27" font-weight="700">E</text><text x="970" y="523" fill="#665b51" font-size="15">BLOCK E</text></g>
+    <text x="155" y="585" fill="#766b61" font-size="15">PARKING</text>
+    <text x="1045" y="585" fill="#766b61" font-size="15">PLAY AREA</text>
+    <text x="1030" y="310" fill="#766b61" font-size="15">CANTEEN</text>
+    <text x="600" y="640" fill="#7a1f2b" font-size="16" font-weight="700">MAIN GATE</text>
+  </g>
+  <path d="M600 540v56" stroke="#7a1f2b" stroke-width="8" stroke-linecap="round"/>
+</svg>

@@ -12,12 +12,36 @@ describe('campus routing', () => {
     expect(route?.minutes).toBeGreaterThan(0)
   })
 
-  it('uses lifts rather than stairs in accessibility mode', () => {
+  it('does not claim an unverified step-free route to an upper floor', () => {
     const route = findRoute('gate', 'B-407', { accessible: true })
+    expect(route).toBeNull()
+  })
+
+  it('keeps verified ground-floor accessible routes free of stairs', () => {
+    for (const destination of ['C-004', 'E-012']) {
+      const route = findRoute('gate', destination, { accessible: true })
+      expect(route).not.toBeNull()
+      expect(route?.edges.every(edge => edge.accessible && edge.type !== 'stairs')).toBe(true)
+    }
+    expect(findRoute('E-205', 'E-111', { accessible: true })).toBeNull()
+  })
+
+  it.each([
+    ['gate', 'E-205', 2],
+    ['gate', 'C-004', 0],
+    ['gate', 'E-012', 0],
+    ['gate', 'B-407', 4],
+    ['E-205', 'E-111', 1]
+  ])('routes %s to %s on floor %i with verified graph transitions', (from, to, targetFloor) => {
+    const route = findRoute(from, to)
     expect(route).not.toBeNull()
-    expect(route?.edges.some(edge => edge.type === 'stairs')).toBe(false)
-    expect(route?.edges.some(edge => edge.type === 'lift')).toBe(true)
-    expect(route?.edges.every(edge => edge.accessible)).toBe(true)
+    expect(route?.nodeIds.at(-1)).toBe(to)
+    expect(campus.nodes.find(node => node.id === to)?.floor).toBe(targetFloor)
+    expect(route?.edges.every(edge => edge.weight > 0)).toBe(true)
+    if (targetFloor > 0 || from === 'E-205') {
+      expect(route?.edges.some(edge => edge.type === 'stairs' || edge.type === 'lift')).toBe(true)
+      expect(route?.instructions.some(step => step.kind.startsWith('stairs') || step.kind === 'lift')).toBe(true)
+    }
   })
 
   it('reroutes when the direct outdoor path to Block B is blocked', () => {

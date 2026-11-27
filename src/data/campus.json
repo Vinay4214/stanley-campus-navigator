@@ -6,6 +6,53 @@
     { "id": "D", "name": "Block D", "floors": [0, 1, 2, 3, 4], "x": 29, "y": 58, "color": "#b8c5d0" },
     { "id": "E", "name": "Block E", "floors": [0, 1, 2, 3, 4], "x": 69, "y": 60, "color": "#d8c1a8" }
   ],
+  "mapNorthOffset": 0,
+  "mapTransforms": [
+    {
+      "id": "campus-ground",
+      "image": "/maps/campus-ground.webp",
+      "page": 16,
+      "sourceSize": [1563, 863],
+      "controlPoints": [
+        { "landmark": "Block A corridor", "world": [17, 28], "image": [650, 485] },
+        { "landmark": "Block E entrance", "world": [69, 60], "image": [1050, 500] },
+        { "landmark": "Open area", "world": [50, 18], "image": [870, 120] }
+      ]
+    },
+    {
+      "id": "campus-location",
+      "image": "/maps/campus-location.webp",
+      "page": 17,
+      "sourceSize": [1563, 863],
+      "controlPoints": [
+        { "landmark": "Chapel Road", "world": [50, 15], "image": [570, 180] },
+        { "landmark": "College site", "world": [50, 50], "image": [510, 420] },
+        { "landmark": "Nampally Main Road", "world": [50, 88], "image": [900, 690] }
+      ]
+    },
+    {
+      "id": "campus-master",
+      "image": "/maps/campus-master.webp",
+      "page": 18,
+      "sourceSize": [1563, 863],
+      "controlPoints": [
+        { "landmark": "Parking area", "world": [50, 25], "image": [760, 230] },
+        { "landmark": "Open area", "world": [50, 55], "image": [820, 530] },
+        { "landmark": "Play area", "world": [25, 70], "image": [450, 600] }
+      ]
+    },
+    {
+      "id": "blocks-ground-floor",
+      "image": "/maps/E-block-ground.webp",
+      "page": 19,
+      "sourceSize": [899, 1599],
+      "controlPoints": [
+        { "landmark": "Main gate entrance", "world": [55, 68], "image": [170, 1360] },
+        { "landmark": "North corridor", "world": [50, 22], "image": [460, 385] },
+        { "landmark": "Block E corridor", "world": [70, 62], "image": [745, 795] }
+      ]
+    }
+  ],
   "rooms": [
     { "id": "C-003", "name": "Staff Room", "type": "staff", "block": "C", "floor": 0, "dept": "Information Technology", "aliases": ["C block staff", "faculty room"], "polygon": [[10,10],[38,10],[38,25],[10,25]] },
     { "id": "C-004", "name": "HoD IT · Dr. A. Kanaka Durga", "type": "office", "block": "C", "floor": 0, "dept": "Information Technology", "aliases": ["head of department", "hod it", "kanaka durga"], "polygon": [[41,10],[70,10],[70,25],[41,25]] },
@@ -26,13 +73,13 @@
     { "id": "D-003", "name": "First Aid Room", "type": "medical", "block": "D", "floor": 0, "dept": "Facilities", "aliases": ["clinic", "nurse", "medical", "emergency"], "polygon": [[10,10],[42,10],[42,25],[10,25]] }
   ],
   "nodes": [
-    { "id":"gate","name":"Main Gate","x":50,"y":88,"floor":0,"kind":"outdoor" },
-    { "id":"quad","name":"Open Area","x":50,"y":52,"floor":0,"kind":"outdoor" },
+    { "id":"gate","name":"Main Gate","x":55,"y":68,"floor":0,"kind":"outdoor" },
+    { "id":"quad","name":"Open Area","x":50,"y":18,"floor":0,"kind":"outdoor" },
     { "id":"parking","name":"Parking Area","x":22,"y":78,"floor":0,"kind":"outdoor" },
     { "id":"play","name":"Play Area","x":80,"y":80,"floor":0,"kind":"outdoor" },
     { "id":"canteen","name":"Canteen","x":85,"y":51,"floor":0,"kind":"outdoor" },
-    { "id":"exit","name":"Main Gate Exit","x":50,"y":92,"floor":0,"kind":"exit" },
-    { "id":"assembly","name":"Assembly Point · Open Area","x":50,"y":48,"floor":0,"kind":"assembly" },
+    { "id":"exit","name":"Main Gate Exit","x":55,"y":70,"floor":0,"kind":"exit" },
+    { "id":"assembly","name":"Assembly Point · Open Area","x":50,"y":16,"floor":0,"kind":"assembly" },
     { "id":"A-0","name":"Block A · Ground floor","x":20,"y":30,"floor":0,"block":"A","kind":"corridor" },
     { "id":"A-1","name":"Block A · 1st floor","x":20,"y":30,"floor":1,"block":"A","kind":"corridor" },
     { "id":"A-2","name":"Block A · 2nd floor","x":20,"y":30,"floor":2,"block":"A","kind":"corridor" },
@@ -58,22 +105,22 @@
     { "id":"E-2","name":"Block E · 2nd floor","x":70,"y":62,"floor":2,"block":"E","kind":"corridor" },
     { "id":"E-3","name":"Block E · 3rd floor","x":70,"y":62,"floor":3,"block":"E","kind":"corridor" },
     { "id":"E-4","name":"Block E · 4th floor","x":70,"y":62,"floor":4,"block":"E","kind":"corridor" },
-    { "id":"C-003","name":"Staff Room","x":40,"y":16,"floor":0,"block":"C","kind":"room" },
-    { "id":"C-004","name":"HoD IT","x":56,"y":16,"floor":0,"block":"C","kind":"room" },
-    { "id":"C-010","name":"Washroom","x":81,"y":16,"floor":0,"block":"C","kind":"room" },
-    { "id":"B-406","name":"Centre of Excellence","x":38,"y":18,"floor":4,"block":"B","kind":"room" },
-    { "id":"B-407","name":"Department of CSE","x":58,"y":18,"floor":4,"block":"B","kind":"room" },
-    { "id":"B-210","name":"Washroom","x":82,"y":18,"floor":2,"block":"B","kind":"room" },
-    { "id":"E-003","name":"Department of AI & DS","x":36,"y":18,"floor":0,"block":"E","kind":"room" },
-    { "id":"E-012","name":"Examination Cell","x":56,"y":18,"floor":0,"block":"E","kind":"room" },
-    { "id":"E-013","name":"Exam Branch / EDP","x":82,"y":18,"floor":0,"block":"E","kind":"room" },
-    { "id":"E-111","name":"Accounts Office","x":36,"y":18,"floor":1,"block":"E","kind":"room" },
-    { "id":"E-204","name":"Staff Room","x":36,"y":18,"floor":2,"block":"E","kind":"room" },
-    { "id":"E-205","name":"Library","x":58,"y":18,"floor":2,"block":"E","kind":"room" },
-    { "id":"A-001","name":"Main Auditorium","x":37,"y":18,"floor":0,"block":"A","kind":"room" },
-    { "id":"B-001","name":"Canteen","x":28,"y":72,"floor":0,"block":"B","kind":"room" },
-    { "id":"D-003","name":"First Aid Room","x":36,"y":18,"floor":0,"block":"D","kind":"room" },
-    { "id":"D-110","name":"Student Services","x":36,"y":18,"floor":1,"block":"D","kind":"room" }
+    { "id":"C-003","name":"Staff Room","x":78,"y":30,"floor":0,"block":"C","kind":"room" },
+    { "id":"C-004","name":"HoD IT","x":78,"y":30,"floor":0,"block":"C","kind":"room" },
+    { "id":"C-010","name":"Washroom","x":78,"y":30,"floor":0,"block":"C","kind":"room" },
+    { "id":"B-406","name":"Centre of Excellence","x":50,"y":24,"floor":4,"block":"B","kind":"room" },
+    { "id":"B-407","name":"Department of CSE","x":50,"y":24,"floor":4,"block":"B","kind":"room" },
+    { "id":"B-210","name":"Washroom","x":50,"y":24,"floor":2,"block":"B","kind":"room" },
+    { "id":"E-003","name":"Department of AI & DS","x":70,"y":62,"floor":0,"block":"E","kind":"room" },
+    { "id":"E-012","name":"Examination Cell","x":70,"y":62,"floor":0,"block":"E","kind":"room" },
+    { "id":"E-013","name":"Exam Branch / EDP","x":70,"y":62,"floor":0,"block":"E","kind":"room" },
+    { "id":"E-111","name":"Accounts Office","x":70,"y":62,"floor":1,"block":"E","kind":"room" },
+    { "id":"E-204","name":"Staff Room","x":70,"y":62,"floor":2,"block":"E","kind":"room" },
+    { "id":"E-205","name":"Library","x":70,"y":62,"floor":2,"block":"E","kind":"room" },
+    { "id":"A-001","name":"Main Auditorium","x":20,"y":30,"floor":0,"block":"A","kind":"room" },
+    { "id":"B-001","name":"Canteen","x":50,"y":24,"floor":0,"block":"B","kind":"room" },
+    { "id":"D-003","name":"First Aid Room","x":28,"y":61,"floor":0,"block":"D","kind":"room" },
+    { "id":"D-110","name":"Student Services","x":28,"y":61,"floor":1,"block":"D","kind":"room" }
   ],
   "edges": [
     { "from":"gate","to":"quad","weight":56,"type":"outdoor","accessible":true },
@@ -112,41 +159,21 @@
     { "from":"A-1","to":"A-2","weight":12,"type":"stairs","accessible":false },
     { "from":"A-2","to":"A-3","weight":12,"type":"stairs","accessible":false },
     { "from":"A-3","to":"A-4","weight":12,"type":"stairs","accessible":false },
-    { "from":"A-0","to":"A-1","weight":20,"type":"lift","accessible":true },
-    { "from":"A-1","to":"A-2","weight":20,"type":"lift","accessible":true },
-    { "from":"A-2","to":"A-3","weight":20,"type":"lift","accessible":true },
-    { "from":"A-3","to":"A-4","weight":20,"type":"lift","accessible":true },
     { "from":"B-0","to":"B-1","weight":12,"type":"stairs","accessible":false },
     { "from":"B-1","to":"B-2","weight":12,"type":"stairs","accessible":false },
     { "from":"B-2","to":"B-3","weight":12,"type":"stairs","accessible":false },
     { "from":"B-3","to":"B-4","weight":12,"type":"stairs","accessible":false },
-    { "from":"B-0","to":"B-1","weight":20,"type":"lift","accessible":true },
-    { "from":"B-1","to":"B-2","weight":20,"type":"lift","accessible":true },
-    { "from":"B-2","to":"B-3","weight":20,"type":"lift","accessible":true },
-    { "from":"B-3","to":"B-4","weight":20,"type":"lift","accessible":true },
     { "from":"C-0","to":"C-1","weight":12,"type":"stairs","accessible":false },
     { "from":"C-1","to":"C-2","weight":12,"type":"stairs","accessible":false },
     { "from":"C-2","to":"C-3","weight":12,"type":"stairs","accessible":false },
     { "from":"C-3","to":"C-4","weight":12,"type":"stairs","accessible":false },
-    { "from":"C-0","to":"C-1","weight":20,"type":"lift","accessible":true },
-    { "from":"C-1","to":"C-2","weight":20,"type":"lift","accessible":true },
-    { "from":"C-2","to":"C-3","weight":20,"type":"lift","accessible":true },
-    { "from":"C-3","to":"C-4","weight":20,"type":"lift","accessible":true },
     { "from":"D-0","to":"D-1","weight":12,"type":"stairs","accessible":false },
     { "from":"D-1","to":"D-2","weight":12,"type":"stairs","accessible":false },
     { "from":"D-2","to":"D-3","weight":12,"type":"stairs","accessible":false },
     { "from":"D-3","to":"D-4","weight":12,"type":"stairs","accessible":false },
-    { "from":"D-0","to":"D-1","weight":20,"type":"lift","accessible":true },
-    { "from":"D-1","to":"D-2","weight":20,"type":"lift","accessible":true },
-    { "from":"D-2","to":"D-3","weight":20,"type":"lift","accessible":true },
-    { "from":"D-3","to":"D-4","weight":20,"type":"lift","accessible":true },
     { "from":"E-0","to":"E-1","weight":12,"type":"stairs","accessible":false },
     { "from":"E-1","to":"E-2","weight":12,"type":"stairs","accessible":false },
     { "from":"E-2","to":"E-3","weight":12,"type":"stairs","accessible":false },
-    { "from":"E-3","to":"E-4","weight":12,"type":"stairs","accessible":false },
-    { "from":"E-0","to":"E-1","weight":20,"type":"lift","accessible":true },
-    { "from":"E-1","to":"E-2","weight":20,"type":"lift","accessible":true },
-    { "from":"E-2","to":"E-3","weight":20,"type":"lift","accessible":true },
-    { "from":"E-3","to":"E-4","weight":20,"type":"lift","accessible":true }
+    { "from":"E-3","to":"E-4","weight":12,"type":"stairs","accessible":false }
   ]
 }

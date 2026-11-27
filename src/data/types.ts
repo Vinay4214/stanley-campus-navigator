@@ -35,6 +35,22 @@ export interface CampusData {
   rooms: CampusRoom[]
   nodes: CampusNode[]
   edges: CampusEdge[]
+  mapNorthOffset?: number
+  mapTransforms?: {
+    id: string
+    image: string
+    page: number
+    sourceSize: [number, number]
+    controlPoints: { landmark: string; world: [number, number]; image: [number, number] }[]
+  }[]
+}
+
+export interface NavigationInstruction {
+  kind: 'walk' | 'outdoor' | 'turn-left' | 'turn-right' | 'uturn' | 'stairs-up' | 'stairs-down' | 'lift' | 'arrive'
+  text: string
+  distance: number
+  floor: number
+  nodeId?: string
 }
 
 export interface RouteResult {
@@ -43,4 +59,5 @@ export interface RouteResult {
   distance: number
   minutes: number
   steps: string[]
+  instructions: NavigationInstruction[]
 }
