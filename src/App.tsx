@@ -492,7 +492,7 @@ function HomePage({ state, updateState, accessible, toggleAccessible, speak }: H
   }
 
   return (
-    <div className="page home-page">
+    <div className={`page home-page ${target && route ? 'route-active' : ''}`}>
       <section className="hero-section">
         <div className="hero-copy">
           <div className="eyebrow"><span className="eyebrow-dot"/> YOUR CAMPUS, MADE SIMPLE</div>
@@ -529,7 +529,7 @@ function HomePage({ state, updateState, accessible, toggleAccessible, speak }: H
       </section>
 
       <section className="explore-section">
-        <form className="route-planner" onSubmit={event => { event.preventDefault(); chooseStart(fromText); submitSearch(query) }}>
+        <form className={`route-planner ${target ? 'has-destination' : ''}`} onSubmit={event => { event.preventDefault(); chooseStart(fromText); submitSearch(query) }}>
           <div className="planner-heading"><div><span className="eyebrow">WALKING DIRECTIONS</span><h2>Plan your route</h2></div><span className="simulated-badge"><span/> Simulated positioning</span></div>
           <div className="planner-fields">
             <label className="planner-field from-field"><span className="origin-dot"/><span>From</span><input list="campus-place-options" value={fromText} onChange={event => setFromText(event.target.value)} onBlur={() => chooseStart(fromText)} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); chooseStart(fromText) } }} aria-label="Starting point" placeholder="Main Gate"/></label>

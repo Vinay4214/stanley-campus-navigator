@@ -344,6 +344,22 @@ main { min-height: calc(100vh - 145px); }
   .route-choice { min-width:calc(50% - 5px);flex:1; }
   .route-floors { width:100%;margin-left:0; }
 }
+@media (min-width: 721px) {
+  .home-page.route-active .hero-section { display:none; }
+  .home-page.route-active .explore-section { padding-top:0; }
+  .home-page.route-active .route-planner { margin:16px 0 14px;padding:12px 16px; }
+  .home-page.route-active .planner-heading { margin-bottom:9px; }
+  .home-page.route-active .planner-heading h2 { font-size:20px; }
+  .home-page.route-active .planner-actions,
+  .home-page.route-active .quick-destinations { display:none; }
+  .home-page.route-active .route-choice-row { margin-top:9px;padding-top:9px; }
+  .home-page.route-active .section-heading { display:none; }
+  .home-page.route-active .explore-grid { grid-template-columns:minmax(0,1.55fr) minmax(330px,.82fr);align-items:start;gap:15px; }
+  .home-page.route-active .route-panel { position:sticky;top:12px;max-height:calc(100vh - 100px);overflow-y:auto;overscroll-behavior:contain;align-self:start; }
+  .home-page.route-active .destination-photo-card { grid-template-columns:112px minmax(0,1fr);margin:10px 0 5px;padding:7px; }
+  .home-page.route-active .destination-photo-card img { width:112px;height:82px; }
+  .home-page.route-active .step-door-photo { width:min(100%,220px);max-height:118px; }
+}
 [data-theme='dark'] .route-planner { background:#292624;border-color:#49413a; }
 [data-theme='dark'] .planner-heading h2 { color:#f0e9df; }
 [data-theme='dark'] .planner-field { color:#c3b6a8;background:#302c29;border-color:#4b423a; }
